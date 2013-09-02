@@ -15,8 +15,8 @@
 	  var player;
 	  function onYouTubePlayerAPIReady() {
 			  player = new YT.Player('player', {
-					  height: '640',
-					  width: '840',
+					  height: '24',
+					  width: '800',
 					  videoId: '{{playlist.0}}',
 					  playerVars: { 'autoplay': 1, 'controls': 1, 'playlist':['{{ playlist|slice:"1:"|join:","}}']},
 					  events: {
