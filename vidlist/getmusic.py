@@ -13,10 +13,11 @@ import json
 from pprint import pprint
 import urlparse
 
-"""
 class Song:
-	def __init__:
-"""
+	def __init__ (self, videoid, title, url):
+		self.videoid = videoid
+		self.title = title
+		self.url = url
 
 def getJSON(subreddit, limit):
 	url = "http://www.reddit.com/r/"+subreddit+"/.json?limit="+str(limit)
@@ -28,26 +29,20 @@ def getvideos(subreddits, limit):
 	for subreddit in subreddits:
 		try:
 			json_data = getJSON(subreddit, limit)
-			urlfeed = []
-			title = []
-			videos = []
+			songs = []
 			for i in json_data["data"]["children"]:
 				if json.dumps(i["data"]["domain"]) in ('"youtube.com"'):
-					urlfeed.append(json.dumps(i["data"]["url"]))
-					title.append(json.dumps(i["data"]["title"]))
+					url = json.dumps(i["data"]["url"])
+					title = json.dumps(i["data"]["title"])
 					url_data = urlparse.urlparse(json.dumps(i["data"]["url"])[1:-1])
 					query = urlparse.parse_qs(url_data.query)
 					video = query["v"][0]
-					videos.append(video)
+					songs.append(Song(video,title,url))
 
 		except KeyError, e:
 			print "Error: Malformed JSON return file"
-		print urlfeed
-		print title
-		#for t in title:
-		#		print t
-		return videos
+		return songs
 
 if __name__ == '__main__':
 	subreddits = ['progmetal']
-	getvideos(subreddits, 20)	
+	getvideos(subreddits, 20)

@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html>
-  <body>
+  <body onload="javascript:startVideo();">
     <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
-    <div id="player"></div>
-
+    <div id="player" style="visibility: hidden"></div>
     <script>
       // 2. This code loads the IFrame Player API code asynchronously.
-      var tag = document.createElement('script');
+	  var tag = document.createElement('script');
+
+	  // Let's populate arrays of videos and titles
+	  var videos = new Array()
+	  var titles = new Array()
+	  {% for song in playlist %}
+		
+
 
       tag.src = "https://www.youtube.com/iframe_api";
       var firstScriptTag = document.getElementsByTagName('script')[0];
@@ -17,8 +23,8 @@
 			  player = new YT.Player('player', {
 					  height: '24',
 					  width: '800',
-					  videoId: '{{playlist.0}}',
-					  playerVars: { 'autoplay': 1, 'controls': 1, 'playlist':['{{ playlist|slice:"1:"|join:","}}']},
+					  videoId: '{{playlist.0.videoid}}',
+					  playerVars: { 'autohide' : 0, 'rel' : 0, 'autoplay': 1, 'controls': 1, 'playlist':['{% for song in playlist %}{% if not forloop.first %}{% if not forloop.last %}{{song.videoid}},{% else %}{{song.videoid}}{% endif %}{% endif %}{% endfor %}']},
 					  events: {
 							  'onReady': onPlayerReady,
 							  'onStateChange': onPlayerStateChange
@@ -38,12 +44,30 @@
 	  function onPlayerStateChange(event) {
 		if (event.data == YT.PlayerState.PLAYING && !done) {
 				<!-- setTimeout(stopVideo, 6000); -->
-			done = true; 
+			done = true;
         }
       }
       function stopVideo() {
         player.stopVideo();
-      }
-    </script>
-  </body>
+	}
+	function startVideo() {
+		document.getElementsByTagName("cur_song")
+		player.playVideo();
+	}
+	function nextVideo() {
+		player.nextVideo();
+	}
+	function previousVideo() {
+		player.nextVideo();
+	}
+</script>
+<div id="cur_song"></div>
+<div id="next_song"></div>
+<div id="prev_song"></div>
+<br>
+<a href="javascript:startVideo();">Start Video</a>
+<a href="javascript:stopVideo();">Stop Video</a>
+<a href="javascript:nextVideo();">Next Video</a>
+<a href="javascript:previousVideo();">Previous Video</a>
+</body>
 </html>
