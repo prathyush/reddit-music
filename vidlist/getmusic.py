@@ -18,6 +18,7 @@ class Song:
 		self.videoid = videoid
 		self.title = title
 		self.url = url
+		self.thumbnail_url = "http://i1.ytimg.com/vi/%s/hqdefault.jpg" % videoid
 
 def getJSON(subreddit, limit):
 	url = "http://www.reddit.com/r/"+subreddit+"/.json?limit="+str(limit)
@@ -33,11 +34,14 @@ def getvideos(subreddits, limit):
 			for i in json_data["data"]["children"]:
 				if json.dumps(i["data"]["domain"]) in ('"youtube.com"'):
 					url = json.dumps(i["data"]["url"])
-					title = json.dumps(i["data"]["title"])
+#					title = str(json.dumps(i["data"]["title"])[1:-1])
 					url_data = urlparse.urlparse(json.dumps(i["data"]["url"])[1:-1])
 					query = urlparse.parse_qs(url_data.query)
-					video = query["v"][0]
-					songs.append(Song(video,title,url))
+					videoid = query["v"][0]
+					yt_url = 'http://gdata.youtube.com/feeds/api/videos/%s?alt=json&v=2' % videoid 
+					yt_json = json.load(urllib.urlopen(yt_url))
+					title = yt_json['entry']['title']['$t']
+					songs.append(Song(videoid,title,url))
 
 		except KeyError, e:
 			print "Error: Malformed JSON return file"

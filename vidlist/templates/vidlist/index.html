@@ -10,10 +10,13 @@
 	  // Let's populate arrays of videos and titles
 	  var videos = new Array()
 	  var titles = new Array()
+	  var thumbnails = new Array()
 	  {% for song in playlist %}
+	  videos.push("{{song.videoid}}");
+	  titles.push("{{song.title}}");
+	  thumbnails.push("{{song.thumbnail_url}}");
+	  {% endfor %}
 		
-
-
       tag.src = "https://www.youtube.com/iframe_api";
       var firstScriptTag = document.getElementsByTagName('script')[0];
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
@@ -41,26 +44,33 @@
       //    The function indicates that when playing a video (state=1),
       //    the player should play for six seconds and then stop.
       var done = false;
-	  function onPlayerStateChange(event) {
-		if (event.data == YT.PlayerState.PLAYING && !done) {
-				<!-- setTimeout(stopVideo, 6000); -->
-			done = true;
-        }
+      function onPlayerStateChange(event) {
+	      if (event.data == YT.PlayerState.PLAYING && !done) {
+		      <!-- setTimeout(stopVideo, 6000); -->
+		      done = true;
+	      }
+	      var num = player.getPlaylistIndex();
+	      var title = titles[num];
+	      document.getElementById("cur_song").innerHTML = "Playing :"+title;
+	      document.getElementById("next_song").innerHTML = "Next    :"+titles[num+1];
+	      document.getElementById("prev_song").innerHTML = "Previous:"+titles[num-1];
+	      document.getElementById("thumbnail").innerHTML = "<img src='"+thumbnails[num]+"'></img>"
       }
       function stopVideo() {
-        player.stopVideo();
-	}
-	function startVideo() {
-		document.getElementsByTagName("cur_song")
-		player.playVideo();
-	}
-	function nextVideo() {
-		player.nextVideo();
+	      player.stopVideo();
+      }
+      function startVideo() {
+	      player.playVideo();
+      }
+      function nextVideo() {
+	      player.nextVideo();
 	}
 	function previousVideo() {
 		player.nextVideo();
 	}
 </script>
+<br>
+<div id="thumbnail"></div>
 <div id="cur_song"></div>
 <div id="next_song"></div>
 <div id="prev_song"></div>
