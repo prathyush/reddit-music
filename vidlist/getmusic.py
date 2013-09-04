@@ -32,15 +32,21 @@ def getvideos(subreddits, limit):
 			json_data = getJSON(subreddit, limit)
 			songs = []
 			for i in json_data["data"]["children"]:
-				if json.dumps(i["data"]["domain"]) in ('"youtube.com"'):
-					url = json.dumps(i["data"]["url"])
-					url_data = urlparse.urlparse(json.dumps(i["data"]["url"])[1:-1])
-					query = urlparse.parse_qs(url_data.query)
-					videoid = query["v"][0]
+				domain = json.dumps(i["data"]["domain"])
+				if domain in ('"youtube.com"', '"youtu.be"'):
+					url = json.dumps(i["data"]["url"])[1:-1]
+					if domain == '"youtube.com"':
+						url_data = urlparse.urlparse(url)
+						query = urlparse.parse_qs(url_data.query)
+						videoid = query["v"][0]
+					else:
+						videoid = url[16:]
+# Turned out expensive.
 #					yt_url = 'http://gdata.youtube.com/feeds/api/videos/%s?alt=json&v=2' % videoid
 #					yt_json = json.load(urllib.urlopen(yt_url))
 #					title = yt_json['entry']['title']['$t']
 					title = str(json.dumps(i["data"]["title"])[1:-1])
+					print videoid, title, url
 					songs.append(Song(videoid,title,url))
 
 		except KeyError, e:
