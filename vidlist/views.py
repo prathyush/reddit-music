@@ -6,8 +6,9 @@ from getmusic import getvideos, Song
 def index(request):
 	subreddits = []
 	subreddit = request.GET.get('s','progmetal')
+	limit = request.GET.get('l', '20')
 	subreddits.append(subreddit)
-	playlist = getvideos(subreddits, 200)
+	playlist = getvideos(subreddits, int(limit))
 	template = loader.get_template('vidlist/index.html')
 	context = RequestContext(request, {
 		'playlist': playlist,
