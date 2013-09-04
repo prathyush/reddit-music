@@ -1,6 +1,9 @@
 <!DOCTYPE html>
+{% load staticfiles %}
 <html>
-  <body onload="javascript:startVideo();">
+	<link rel="stylesheet" type="text/css" href="{% static 'vidlist/style.css' %}" />
+	<body onload="javascript:startVideo();">
+		<div id="container">
     <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
     <div id="player" style="visibility: hidden"></div>
     <script>
@@ -16,7 +19,7 @@
 	  titles.push("{{song.title}}");
 	  thumbnails.push("{{song.thumbnail_url}}");
 	  {% endfor %}
-		
+
       tag.src = "https://www.youtube.com/iframe_api";
       var firstScriptTag = document.getElementsByTagName('script')[0];
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
@@ -41,8 +44,6 @@
       }
 
       // 5. The API calls this function when the player's state changes.
-      //    The function indicates that when playing a video (state=1),
-      //    the player should play for six seconds and then stop.
       var done = false;
       function onPlayerStateChange(event) {
 	      if (event.data == YT.PlayerState.PLAYING && !done) {
@@ -52,14 +53,14 @@
 	      var num = player.getPlaylistIndex();
 	      var title = titles[num];
 	      document.getElementById("cur_song").innerHTML = "Playing :"+title;
-	      document.getElementById("next_song").innerHTML = "Next    :"+titles[num+1];
+		  document.getElementById("next_song").innerHTML = "Next    :"+titles[num+1];
 	      document.getElementById("prev_song").innerHTML = "Previous:"+titles[num-1];
 	      document.getElementById("thumbnail").innerHTML = "<img src='"+thumbnails[num]+"'></img>"
       }
-      function stopVideo() {
-	      player.stopVideo();
+      function pauseVideo() {
+	      player.pauseVideo();
       }
-      function startVideo() {
+      function playVideo() {
 	      player.playVideo();
       }
       function nextVideo() {
@@ -75,9 +76,18 @@
 <div id="next_song"></div>
 <div id="prev_song"></div>
 <br>
-<a href="javascript:startVideo();">Start Video</a>
-<a href="javascript:stopVideo();">Stop Video</a>
-<a href="javascript:nextVideo();">Next Video</a>
-<a href="javascript:previousVideo();">Previous Video</a>
+<!--
+<a href="javascript:previousVideo();">Previous</a>
+<a href="javascript:startVideo();">Play</a>
+<a href="javascript:stopVideo();">Pause</a>
+<a href="javascript:nextVideo();">Next</a>
+-->
+<div id="buttons">
+<div id="rew" onclick="javascript:previousVideo();"></div>
+<div id="play" onclick="javascript:playVideo();"></div>
+<div id="pause" onclick="javascript:pauseVideo();"></div>
+<div id="fwd" onclick="javascript:nextVideo();" ></div>
+</div> <!-- buttons -->
+</div> <!-- container -->
 </body>
 </html>

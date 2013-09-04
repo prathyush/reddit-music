@@ -11,5 +11,7 @@ and create a playlist of youtube videos.
 TODO
 ============
 
-Use Youtube gdata API to retrieve video information.
 Channel-ize subreddits and let user pick multiple genres.
+A playlist interface for easy browsing through the list.
+Implement shuffle and repeat.
+Redo UI using HTML5, CSS and JQuery.

@@ -34,13 +34,13 @@ def getvideos(subreddits, limit):
 			for i in json_data["data"]["children"]:
 				if json.dumps(i["data"]["domain"]) in ('"youtube.com"'):
 					url = json.dumps(i["data"]["url"])
-#					title = str(json.dumps(i["data"]["title"])[1:-1])
 					url_data = urlparse.urlparse(json.dumps(i["data"]["url"])[1:-1])
 					query = urlparse.parse_qs(url_data.query)
 					videoid = query["v"][0]
-					yt_url = 'http://gdata.youtube.com/feeds/api/videos/%s?alt=json&v=2' % videoid 
-					yt_json = json.load(urllib.urlopen(yt_url))
-					title = yt_json['entry']['title']['$t']
+#					yt_url = 'http://gdata.youtube.com/feeds/api/videos/%s?alt=json&v=2' % videoid
+#					yt_json = json.load(urllib.urlopen(yt_url))
+#					title = yt_json['entry']['title']['$t']
+					title = str(json.dumps(i["data"]["title"])[1:-1])
 					songs.append(Song(videoid,title,url))
 
 		except KeyError, e:
