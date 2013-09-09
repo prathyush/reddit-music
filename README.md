@@ -11,7 +11,8 @@ and create a playlist of youtube videos.
 TODO
 ============
 
-Channel-ize subreddits and let user pick multiple genres.
-A playlist interface for easy browsing through the list.
-Implement shuffle and repeat.
-Redo UI using HTML5, CSS and JQuery.
+Single JS wrapper script for streaming music off youtube, vimeo and soundcloud.
+
+Redo UI using bootstrap3.
+	- Playlist Interface.
+	- Support subreddits & multireddits.

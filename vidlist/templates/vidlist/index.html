@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 {% load staticfiles %}
 <html>
-	<link rel="stylesheet" type="text/css" href="{% static 'vidlist/style.css' %}" />
+	<link rel="stylesheet" type="text/css" href="{% static 'vidlist/css/style.css' %}" />
+	<link rel="stylesheet" type="text/css" href="{% static 'vidlist/font-awesome/css/font-awesome.min.css' %}" />
 	<body onload="javascript:startVideo();">
 		<div id="container">
     <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
-    <div id="player" style="visibility: hidden"></div>
+		    <div id="player" style="visibility: hidden"></div>
+		    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
     <script>
       // 2. This code loads the IFrame Player API code asynchronously.
 	  var tag = document.createElement('script');
@@ -16,7 +18,7 @@
 	  var thumbnails = new Array()
 	  {% for song in playlist %}
 	  videos.push("{{song.videoid}}");
-	  titles.push("{{song.title}}");
+	  titles.push("{{song.title|safe}}");
 	  thumbnails.push("{{song.thumbnail_url}}");
 	  {% endfor %}
 
@@ -47,7 +49,7 @@
       var done = false;
       function onPlayerStateChange(event) {
 	      if (event.data == YT.PlayerState.PLAYING && !done) {
-		      <!-- setTimeout(stopVideo, 6000); -->
+		      setTimeout(pauseVideo, 2000);
 		      done = true;
 	      }
 	      var num = player.getPlaylistIndex();
@@ -82,6 +84,7 @@
 <a href="javascript:stopVideo();">Pause</a>
 <a href="javascript:nextVideo();">Next</a>
 -->
+<i class="icon-play-sign">Play Sign</i>
 <div id="buttons">
 <div id="rew" onclick="javascript:previousVideo();"></div>
 <div id="play" onclick="javascript:playVideo();"></div>

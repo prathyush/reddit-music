@@ -1,0 +1,117 @@
+
+a {
+		text-decoration: none;
+}
+
+/*
+#players {
+		position: relative;
+		z-index: 3;
+		position: absolute;
+		background: white;
+}
+
+#splayer, #youtube-player {
+		position: absolute;
+		z-index: 1;
+}
+*/
+
+#previous, #next, #play {
+		font-color: black;
+}
+
+#previous:hover, #next:hover, #play:hover {
+		font-color: blue;
+}
+
+#content {
+		display: table;
+		margin: 0 auto;
+}
+
+#player-controls {
+		display: table;
+		margin: 0 auto;
+		height: 100px;
+}
+
+#player-controls a {
+}
+
+#play-controls:before, #play-controls:after {
+		content: "";
+		display: table;
+}
+
+#play-controls:after {
+		clear: both;
+}
+
+.playing #play-controls {
+		display: block;
+}
+
+#player-container {
+		width: 100%;
+		min-width: 700px;
+}
+
+#player-container:after {
+		clear: both;
+}
+
+#playlist {
+		float: left;
+}
+
+/*
+#seekbar {
+width: 200px;
+		height: 10px;
+		position: relative;
+
+}
+*/
+
+#progress-bar {
+		background: none repeat scroll 0 0 #000000;
+		border-radius: 2px 2px 2px 2px;
+		bottom: 4px;
+		height: 8px;
+		width: 400px;
+		right: 38px;
+		float: left;
+		margin-top: 30px;
+		margin-left: 5px;
+		margin-right: 5px;
+}
+
+#scrubber {
+		background-position: -7px -67px;
+		cursor: pointer;
+		height: 16px;
+		left: -8px;
+		top: -4px;
+		width: 16px;
+		z-index: 100;
+		float: left;
+}
+
+.player-icon, #scrubber {
+}
+
+#time-elapsed, #time-total {
+	margin-top: 15px;
+	float: left;
+}
+/*
+#previous, #next {
+		margin-bottom: 5px;
+		margin-top: 5px;
+}
+*/
+
+#nav {
+		float: right;
+}
