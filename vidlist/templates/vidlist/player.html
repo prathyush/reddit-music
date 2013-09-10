@@ -9,278 +9,293 @@
 	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
 	<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 	<script src="http://w.soundcloud.com/player/api.js"></script>
+	<script src="http://a.vimeocdn.com/js/froogaloop2.min.js?36191-1378685323"></script>
 	<script src="{% static 'vidlist/bootstrap3/dist/js/bootstrap.min.js' %}"></script>
 	<script src="{% static 'vidlist/bootstrap3/dist/js/bootstrap.js' %}"></script>
 	<script>
-			var play = 0;
-			var songs = [];
-			var curSong;
+		var playerState = 0;
+		var curVideoId;
 
-			//Youtube IFRAME API Code.
+		{% if playlist %}
+		//We've got a GET request. Let's load the playlist with these and possibly use the subreddit to highlight the nav.
+		var videos = {{playlist|safe}};
+		var subreddit = {{subreddit}};
+		{% endif %}
 
-			var tag = document.createElement('script');
-			tag.src = "https://www.youtube.com/iframe_api";
-			var firstScriptTag = document.getElementsByTagName('script')[0];
-			firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+		//Youtube IFRAME API Code.
 
-			var player;
-			function onYouTubeIframeAPIReady() {
-					player = new YT.Player('yplayer', {
-							height: '24',
-							width: '200',
-							videoId: 'yv-Fk1PwVeU',
-							events: {
-									'onReady': onPlayerReady,
-									'onStateChange': onPlayerStateChange
-							}
-					});
+		var tag = document.createElement('script');
+		tag.src = "https://www.youtube.com/iframe_api";
+		var firstScriptTag = document.getElementsByTagName('script')[0];
+		firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+		var player;
+		function onYouTubeIframeAPIReady() {
+			player = new YT.Player('yplayer', {
+				height: '1',
+				width: '1',
+				videoId: 'yv-Fk1PwVeU',
+				events: {
+					'onReady': onPlayerReady,
+					'onStateChange': onPlayerStateChange
+				}
+			});
+		}
+
+		function onPlayerReady(event) {
+			//					event.target.playVideo();
+			console.log('Youtube: Ready for requests.');
+			setInterval(updatePlayerInfo, 250);
+			updatePlayerInfo('youtube');
+		}
+
+		function onPlayerStateChange(event) {
+			var duration;
+			if (event.data == YT.PlayerState.PLAYING) {
+				console.log('Youtube: Elapsed:'+player.getCurrentTime()+'. And, fraction :'+player.getVideoLoadedFraction()+'.');
 			}
-
-			function onPlayerReady(event) {
-//					event.target.playVideo();
-					console.log('Youtube: Ready for requests.');
-					setInterval(updatePlayerInfo, 250);
-					updatePlayerInfo('youtube');
+			if (event.data == YT.PlayerState.CUED) {
+				duration = player.getDuration();
 			}
+		}
 
-			function onPlayerStateChange(event) {
-					var duration;
-					if (event.data == YT.PlayerState.PLAYING) {
-							console.log('Youtube: Elapsed:'+player.getCurrentTime()+'. And, fraction :'+player.getVideoLoadedFraction()+'.');
-					}
-					if (event.data == YT.PlayerState.CUED) {
-							duration = player.getDuration();
-					}
+		function youtubeStopVideo() {
+			player.stopVideo();
+		}
+		function youtubePauseVideo() {
+			player.pauseVideo();
+		}
+		function youtubePlayVideo() {
+			player.playVideo();
+		}
+		function youtubePlayPauseVideo() {
+			var state = player.getPlayerState();	
+			if (state == 1) {
+				player.pauseVideo();
+				} else {
+				player.playVideo();
 			}
+		}
 
-			function youtubeStopVideo() {
-					player.stopVideo();
+		function youtubeLoadVideo(videoid) {
+			player.loadVideoById(videoid, 1, "default");
+			console.log('Youtube: Loding video by videoid:'+videoid+'.');
+			state = player.getPlayerState();
+			if (typeof(state) == 'undefined') {
+				//Seems to be an error
 			}
-			function youtubePauseVideo() {
-					player.pauseVideo();
-			}
-			function youtubePlayVideo() {
-					player.playVideo();
-			}
-			function youtubePlayPauseVideo() {
-					var state = player.getPlayerState();	
-					if (state == 1) {
-							player.pauseVideo();
-							} else {
-							player.playVideo();
-					}
-			}
+		}
 
-			function youtubeLoadVideo(videoid) {
-					player.loadVideoById(videoid, 1, "default");
-					console.log('Youtube: Loding video by videoid:'+videoid+'.');
-					state = player.getPlayerState();
-					if (typeof(state) == 'undefined') {
-							//Seems to be an error
-					}
-			}
-			
-			function playPlayPauseVideo() {
-			}
+		function playPlayPauseVideo() {
+		}
 
-			function playButtonPress() {
-					//			alert('playpause');
-					var widgetIframe = document.getElementById('soundcloud-player');
-					widget       = SC.Widget(widgetIframe);
-					widget.toggle();/*
-					if (play == 0) {
-							console.log("Not playing ..");
-							widget.play();
-							} else {
-							console.log("Playing, so pausing.");
-							widget.pause();
-					}*/
-					$("#play-pause i").toggleClass("fw-icon-play fw-icon-pause"); //.button('refresh');
-					play = !play;
-			}
+		function playButtonPress() {
+			//			alert('playpause');
+			var widgetIframe = document.getElementById('soundcloud-player');
+			widget       = SC.Widget(widgetIframe);
+			widget.toggle();/*
+			if (play == 0) {
+				console.log("Not playing ..");
+				widget.play();
+				} else {
+				console.log("Playing, so pausing.");
+				widget.pause();
+			}*/
+			$("#play-pause i").toggleClass("fw-icon-play fw-icon-pause"); //.button('refresh');
+			play = !play;
+		}
 
 
-			function videoElement (videoid, title, thumbnail_url) {
-					this.videoid = videoid;
-					this.title = title;
-					this.thumbnail = thumbnail_url;
-					this.domain = domain;
-			}
+		function videoElement (videoid, title, thumbnail_url) {
+			this.videoid = videoid;
+			this.title = title;
+			this.thumbnail = thumbnail_url;
+			this.domain = domain;
+		}
 
-			function setSongDuration(song, duration) {
-					song.duration = duration;
-			}
+		function setSongDuration(song, duration) {
+			song.duration = duration;
+		}
 
-			// Temporary list for starters
-			// Let's populate arrays of videos and titles
-			var videos = new Array();
-			var titles = new Array();
-			var thumbnails = new Array();
-			var domain = new Array();
-			{% for song in playlist %}
-			videos.push("{{song.videoid}}");
-			titles.push("{{song.title}}");
-			thumbnails.push("{{song.thumbnail_url}}");
-			songs.push(videoElement("{{song.videoid}}","{{song.title|safe}}","{{song.thumbnail_url}}","{{song.source}}"));
-			{% endfor %}
 
-			$(document).ready(function() {
-					//loadSoundCloud('thehightides/mama');
-					console.log('In ready.');
-					window.scWidget	= SC.Widget(document.getElementById('soundcloud-player'));
-					window.scWidget.bind(SC.Widget.Events.READY, function() {
-							console.log('Soundcloud: Ready for requests.');	
-					});
-					window.scWidget.bind(SC.Widget.Events.PLAY, function() {
-							scWidget.getDuration(function(duration) {
-									console.log('Soundcloud: Duration:'+duration+'.');
-									setSongDuration(duration);
-							});
-					});
-					window.scWidget.bind(SC.Widget.Events.PLAY_PROGRESS, function(eventData) {
-							var curPosition = -1;
-							//console.log(JSON.stringify(eventData || {}));
-							scWidget.getPosition(function(position) {
-								console.log('Soundcloud: CurPos:'+curPosition+'.');
-							});
-			//				updateProgressBar(eventData);
-					});
-					window.scWidget.bind(SC.Widget.Events.LOAD_PROGRESS, function() {
-							console.log('Soundcloud: Loading.');
-					});
-					window.scWidget.bind(SC.Widget.Events.PAUSE, function() {
-							console.log('Soundcloud: Paused');
-					});
-
-					// updateDuration();
-					// submitAJAXForm();
-
-					$("#seekbar").slider(
-					{
-							min: 0,
-							max: 100,
-							step: 1,
-							change: showValue
-
-					});
-
-					$('.navlinks').click(function() {
-							text = $(this).text();
-							console.log('sub-reddit:'+text);
-							submit_ajax(text);
-					});
-
-					$('#progress-bar').hide();
+		$(document).ready(function() {
+			//loadSoundCloud('thehightides/mama');
+			console.log('In ready.');
+			window.scWidget	= SC.Widget(document.getElementById('soundcloud-player'));
+			window.scWidget.bind(SC.Widget.Events.READY, function() {
+				console.log('Soundcloud: Ready for requests.');	
+			});
+			window.scWidget.bind(SC.Widget.Events.PLAY, function() {
+				scWidget.getDuration(function(duration) {
+					console.log('Soundcloud: Duration:'+duration+'.');
+					setSongDuration(duration);
+				});
+			});
+			window.scWidget.bind(SC.Widget.Events.PLAY_PROGRESS, function(eventData) {
+				var curPosition = -1;
+				//console.log(JSON.stringify(eventData || {}));
+				scWidget.getPosition(function(position) {
+					console.log('Soundcloud: CurPos:'+curPosition+'.');
+				});
+				//				updateProgressBar(eventData);
+			});
+			window.scWidget.bind(SC.Widget.Events.LOAD_PROGRESS, function() {
+				console.log('Soundcloud: Loading.');
+			});
+			window.scWidget.bind(SC.Widget.Events.PAUSE, function() {
+				console.log('Soundcloud: Paused');
 			});
 
-			function showValue(event, ui) {
-					$("#val").html(ui.value);
-			}
+			// Vimeo IFRAME API Code.
 
-			function updatePlayerInfo() {
-			}
+			var viframe = document.getElementById('vimeo-player');
+			vplayer = $f(viframe);
 
-			function submit_ajax(text) {
-					$.ajax({
-							type: 'POST',
-							url: '',
-							data: { 'csrfmiddlewaretoken':'{{csrf_token}}',
-									'subreddit' : text,
-									'limit' : 100
-							},
-							success: function(data, status, xhr) {
-								console.log("AJAX success");
-								console.log("data: "+data);
-								$("#playlist").html(data);
-							}
-					});
-			}
+			// When the player is ready, add listeners for pause, finish, and playProgress
+			vplayer.addEvent('ready', function() {
+				console.log("Vimeo: Ready for requests.");
+				/*
+				vplayer.addEvent('pause', onPause);
+				vplayer.addEvent('finish', onFinish);
+				vplayer.addEvent('playProgress', onPlayProgress);
+				*/
+			});
 
-			function updateProgressBar(eventData) {
-					var pbWidth = $('#progress-bar').width();
-//					var loading = eventData.loading;
-					var currentPosition = eventData.currentPosition/1000;
-					var relativePosition = eventData.relativePosition;
-					var scrubberWidth = relativePosition*pbwidth;
-					if (scrubberWidth > 0) {
-							$('#scrubber').css('left', scrubberWidth+'px');
-					}
-					$("#time-elapsed").text("");
-					$("#time-total").text("");
-			}
+			// updateDuration();
 
-			function stopButtonPress() {
-			}
+			$("#seekbar").slider(
+			{
+				min: 0,
+				max: 100,
+				step: 1,
+				change: showValue
 
-			function loadIframe(iframeName, params) {
-					var $iframe = $('#' + iframeName);
-					if ($iframe.length) {
-							//set iframe attributes
-							$iframe.attr('src', params['src']);
-							$iframe.attr('width', 420);
-							$iframe.attr('height', 120);
-							$iframe.attr('frameborder', 'no');
-							return false;
-					}
-					return true;
-			}
+			});
 
-			function loadSoundCloud(videoid) {
-					var widgetIframe = document.getElementById('soundcloud-player');
-					widget = SC.Widget(widgetIframe);
-					var src="http://w.soundcloud.com/player/?url=https://api.soundcloud.com/"+videoid+"&show_artwork=false&liking=false&sharing=false&auto_play=false";
-//					loadIframe('soundcloud-player', {'src': src });
-					widget.load(src, {
-							show_artwork: false
-					});
-			}
+			$('.navlinks').click(function() {
+				text = $(this).text();
+				console.log('sub-reddit:'+text);
+				submit_ajax(text);
+			});
 
-			function loadVimeo(videoid) {
-			}
+			$('#progress-bar').hide();
+			//					loadVimeo('73874741');
+		});
 
-			function loadVideo(videoid, source) {
-				console.log('source :'+source);	
-				switch(source) {
-					case 'youtube.com':
-						youtubeLoadVideo(videoid);
-					case 'soundcloud.com':
-						loadSoundCloud(videoid);
-					default:
-						break;	
+		function showValue(event, ui) {
+			$("#val").html(ui.value);
+		}
 
+		function updatePlayerInfo() {
+		}
+
+		function submit_ajax(text) {
+			$.ajax({
+				type: 'POST',
+				url: '',
+				data: { 'csrfmiddlewaretoken':'{{csrf_token}}',
+					'subreddit' : text,
+					'limit' : 100
+				},
+				success: function(data, status, xhr) {
+					console.log("AJAX success");
+					console.log("data: "+data);
+					$("#playlist").html(data);
 				}
-			}
+			});
+		}
 
-			function populateList(videoElements) {
-					var items = [];
-					$.each(videoElements, function (key, value) {
-							items.push('<a href="#" class="list-group-item">'+'<span>'+value.title+'</span></a>');
-					});
-					$("#playlist").append(items.join(''));
+		function updateProgressBar(eventData) {
+			var pbWidth = $('#progress-bar').width();
+			//					var loading = eventData.loading;
+			var currentPosition = eventData.currentPosition/1000;
+			var relativePosition = eventData.relativePosition;
+			var scrubberWidth = relativePosition*pbwidth;
+			if (scrubberWidth > 0) {
+				$('#scrubber').css('left', scrubberWidth+'px');
 			}
+			$("#time-elapsed").text("");
+			$("#time-total").text("");
+		}
+
+		function stopButtonPress() {
+		}
+
+		function loadIframe(iframeName, params) {
+			var $iframe = $('#' + iframeName);
+			if ($iframe.length) {
+				//set iframe attributes
+				$iframe.attr('src', params['src']);
+				$iframe.attr('width', 400);
+				$iframe.attr('height', 400);
+				$iframe.attr('frameborder', 'no');
+				console.log('loadIframe: done');
+				return false;
+			}
+			return true;
+		}
+
+		function loadSoundCloud(videoid) {
+			var widgetIframe = document.getElementById('soundcloud-player');
+			widget = SC.Widget(widgetIframe);
+			var src="http://w.soundcloud.com/player/?url=https://api.soundcloud.com/"+videoid+"&show_artwork=false&liking=false&sharing=false&auto_play=false";
+			//					loadIframe('soundcloud-player', {'src': src });
+			widget.load(src, {
+				show_artwork: false
+			});
+		}
+
+		function loadVimeo(videoid) {
+			srcStr = "http://player.vimeo.com/video/"+videoid+"?api=1&player_id=vimeo-player";
+			loadIframe('vimeo-player', {'src': srcStr});
+		}
+
+		function loadVideo(videoid, source) {
+			console.log('source :'+source);	
+			switch(source) {
+				case 'youtube.com':
+				youtubeLoadVideo(videoid);
+				case 'soundcloud.com':
+				loadSoundCloud(videoid);
+				default:
+				break;	
+
+			}
+		}
+
+		function populateList(videoElements) {
+			var items = [];
+			$.each(videoElements, function (key, value) {
+				items.push('<a href="#" class="list-group-item">'+'<span>'+value.title+'</span></a>');
+			});
+			$("#playlist").append(items.join(''));
+		}
 
 	</script>
 	<body>  
-			<div id="wrapper"></div>
-			<div id="players" style='visibility: hidden'>
+		<div id="wrapper"></div>
+		<div id="players" style='visibility: hidden'>
 			<div id="splayer">
-					<iframe  id="soundcloud-player" src="http://w.soundcloud.com/player/?url=https://api.soundcloud.com/aurora-florence/forever-and-a-day&show_artwork=false&liking=false&sharing=false&auto_play=false" width='10' height='10'></iframe>
+				<iframe  id="soundcloud-player" src="http://w.soundcloud.com/player/?url=https://api.soundcloud.com/aurora-florence/forever-and-a-day&show_artwork=false&liking=false&sharing=false&auto_play=false" width='1' height='1'></iframe>
 			</div>
 			<div id="yplayer" >
-					<div id="youtube-player"></div>
+				<div id="youtube-player"></div>
 			</div>
-	</div> <!-- players -->
-			<div id="content">
+			<div id="vplayer">
+				<iframe id="vimeo-player" src="http://player.vimeo.com/video/27855315?api=1&player_id=vimeo-player" width="1" height="1" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+			</div>
+		</div> <!-- players -->
+		<div id="content">
 			<div id="nav" class="pull-left" style-="height: 100%">
-					{% csrf_token %}
-					<ul class="nav nav-pills nav-stacked">
-							<li><a href="#" class='navlinks' id='nav-link'>/r/jazz</a></li>
-							<li><a href="#" class='navlinks' id='nav-link'>/r/blues</a></li>
-							<li><a href="#" class='navlinks' id='nav-link'>/r/bluesrock</a></li>
-							<li><a href="#" class='navlinks' id='nav-link'>/r/progmetal</a></li>
-					</ul>
+				{% csrf_token %}
+				<ul class="nav nav-pills nav-stacked">
+					<li><a href="#" class='navlinks' id='nav-link'>/r/jazz</a></li>
+					<li><a href="#" class='navlinks' id='nav-link'>/r/blues</a></li>
+					<li><a href="#" class='navlinks' id='nav-link'>/r/bluesrock</a></li>
+					<li><a href="#" class='navlinks' id='nav-link'>/r/progmetal</a></li>
+				</ul>
 			</div>
-	<div id='player-container' class='well'>
+			<div id='player-container' class='well'>
 			<div id='player-controls'>
 					<a id="previous" class='' onclick='backwardButtonPress()' href='#' style='text-decoration: none'><i class="fw-icon-step-backward fw-icon-2x"></i></a>&nbsp;&nbsp;&nbsp;
 					<a id="play-pause" class='' onclick='playButtonPress()' href='#' style='text-decoration: none'><i class="fw-icon-play fw-icon-3x"></i></a>&nbsp;&nbsp;
