@@ -34,8 +34,9 @@ def player(request):
 				response_dict[song.videoid] = {'title' : song.title, 'source' : song.source, 'url' : song.url}
 			response_json = simplejson.dumps(response_dict)
 			context = RequestContext(request, {
-				'playlist': response_json,
+				'playlist_json': response_json,
 				'subreddit': subreddit,
+				'playlist': playlist,
 			})
 		else:
 			print "Usual Execution"
@@ -47,6 +48,6 @@ def player(request):
 	subreddits.append(subreddit)
 	playlist = getvideos(subreddits, int(limit))
 	template = loader.get_template('vidlist/playlist.html')
-	context = RequestContext(request, {'songs' : playlist})
+	context = RequestContext(request, {'playlist' : playlist})
 #	return TemplateResponse(request, template, {'songs' : playlist})
 	return HttpResponse(template.render(context))

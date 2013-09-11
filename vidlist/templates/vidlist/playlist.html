@@ -2,12 +2,12 @@
 {% load staticfiles %}
 {% block content %}
 <div class="list-group">
-{% for video in songs %}
-<a href='#' class="list-group-item" id='{{video.videoid}}' onclick="loadVideo('{{video.videoid}}','{{video.source}}')">
-			<h4 class='element list-group-item-heading'>
+{% for video in playlist %}
+<a href='#' class="list-group-item" id='{{video.videoid}}' onclick="loadVideo.call(this,'{{video.videoid}}','{{video.source}}')">
+			<h4 class='list-group-item-heading'>
 					{{ video.title | safe }}	
 			</h4>
-			<p class='list-group-item-text pull-right'>{{video.source}}</p>
+			<p class='list-group-item-text'>{{video.source}}</p>
 </a>
 {% endfor %}
 </div> <!-- list-group -->

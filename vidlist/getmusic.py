@@ -20,6 +20,8 @@ class Song:
 		self.url = url
 		self.thumbnail_url = "http://i1.ytimg.com/vi/%s/hqdefault.jpg" % videoid
 		self.source = source
+	def to_json(self):
+		return {'videoid': self.videoid, 'title' : self.title, 'url' : self.url, 'thumbnail_url' : self.thumbnail_url, 'source' : self.source}
 
 def getRedditJSON(subreddit, limit):
 	url = "http://www.reddit.com/r/"+subreddit+"/.json?limit="+str(limit)

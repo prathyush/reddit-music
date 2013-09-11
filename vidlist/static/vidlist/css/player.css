@@ -32,8 +32,9 @@ a {
 
 #player-controls {
 		display: table;
-		margin: 0 auto;
 		height: 100px;
+		margin-top: 100px;
+		margin-left: 20px;
 }
 
 #player-controls a {
@@ -53,8 +54,10 @@ a {
 }
 
 #player-container {
-		width: 100%;
-		min-width: 700px;
+		min-width: 400px;
+		height: 100px;
+		margin-top:100px;
+		margin-left: 20px;
 }
 
 #player-container:after {
@@ -113,5 +116,7 @@ width: 200px;
 */
 
 #nav {
-		float: right;
+	position: absolute;
+	left: 20%;
+	top: 100px;
 }
