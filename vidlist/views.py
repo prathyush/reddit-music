@@ -51,3 +51,9 @@ def player(request):
 	context = RequestContext(request, {'playlist' : playlist})
 #	return TemplateResponse(request, template, {'songs' : playlist})
 	return HttpResponse(template.render(context))
+
+def demo(request):
+	print "Demo: "
+	template = loader.get_template('vidlist/demo.html')
+	context = RequestContext(request, {});
+	return HttpResponse(template.render(context))
