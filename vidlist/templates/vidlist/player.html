@@ -16,6 +16,8 @@
 	<script src="http://connect.soundcloud.com/sdk.js"></script>
 	<script src="//connect.soundcloud.com/sdk.js"></script>
 	<script type="text/javascript"> SC.initialize({client_id: "dab62a6ff784a2bdc938a8047675ccd0"}); </script>
+	<script type="text/javascript" src="{% static 'vidlist/pnotify/jquery.pnotify.min.js' %}"></script>
+	<link href="{% static 'vidlist/pnotify/jquery.pnotify.default.css' %}" media="all" rel="stylesheet" type="text/css" />
 
 	<script>
 		// Global variables
@@ -177,6 +179,7 @@
 			window.scWidget.bind(SC.Widget.Events.ERROR, function(eventData){
 				console.log('Soundcloud: Error');
 				console.log(JSON.stringify(eventData || {}));
+				onError();
 			});
 
 			// Vimeo IFRAME API Code.
@@ -236,7 +239,7 @@
 		}
 		function onError() {
 			$("#play-pause i").removeClass("fw-icon-pause").addClass("fw-icon-play"); //.button('refresh');
-			//Alerts and stuff.
+			alert('There has been a playback error, lets move on.');
 		}
 		function onPlayProgress() {
 		}
@@ -307,7 +310,7 @@
 		}
 
 		function loadSoundCloud (videoid) {
-			console.log("loadSoundCloud: begin"+SC.get(videoid).sharing);
+			console.log("loadSoundCloud: begin");
 			var widgetIframe = document.getElementById('soundcloud-player');
 			widget = SC.Widget(widgetIframe);
 			var src="http://w.soundcloud.com/player/?url=https://api.soundcloud.com/"+videoid+"&show_artwork=false&liking=false&sharing=false&auto_play=false";
@@ -458,8 +461,22 @@
 			});
 			$("#playlist").append(items.join(''));
 		}
-	</script>
-	<body>  
+		
+		function consume_alert() {
+		//	if (_alert) return;
+		//	_alert = window.alert;
+			window.alert = function(message) {
+				$.pnotify({
+					title: 'Alert',
+					text: message
+				});
+			};
+			console.log('consuming alerts');
+
+		}
+		consume_alert();
+		</script>
+		<body>  
 		<div id="wrapper"></div>
 		<div id="players" style='visibility: hidden; height: 2px; width: 2px'>
 			<div id="splayer">
