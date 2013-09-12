@@ -37,9 +37,33 @@
 					// Refer http://code.google.com/p/jquery-nicescroll/
 					$("html").niceScroll({styler:"fb",cursorcolor:"#000", cursorwidth:'2px'});
 					$("#playlist-tracks").niceScroll();
-			});
+					$(".playlist-track").click(function() {
+						$(this).parent().find('.active').removeClass('active');
+						$(this).addClass('active');
+					});
+				});
+			function playButtonPress() {
+			if ($("#play-pause i").hasClass('fw-icon-pause')) {
+				$("#play-pause i").toggleClass("fw-icon-play fw-icon-pause"); //.button('refresh');
+			}
+			else if ($("#play-pause i").hasClass('fw-icon-play')) {
+				$("#play-pause i").toggleClass("fw-icon-play fw-icon-pause"); //.button('refresh');
+			}
+			/*
+			if (play == 0) {
+				console.log("Not playing ..");
+				widget.play();
+				} else {
+				console.log("Playing, so pausing.");
+				widget.pause();
+			}*/
+		}
+		function togglePlayPause() {
+			console.log("Play/Pause");
+			$("#play-pause i").toggleClass("fw-icon-play fw-icon-pause"); //.button('refresh');
+		}
 	</script>
-    <!-- Wrap all page content here -->
+	<!-- Wrap all page content here -->
     <div id="wrap">
 			
 	  <!-- title div -->
@@ -68,26 +92,30 @@
 			  <div style="clear: both"></div>
 			  <div id="playlist">
 					  <div id="playlist-meta"><span>12 tracks found for Jazz</span></div>
-					  <div id="playlist-tracks" class="list-group">
-							  <a class="list-group-item">Track 1</a>
-							  <a class="list-group-item active">Track 1</a>
-							  <a class="list-group-item">Track 2</a>
-							  <a class="list-group-item">Track 2</a>
-							  <a class="list-group-item">Track 2</a>
-							  <a class="list-group-item">Track 2</a>
-							  <a class="list-group-item">Track 2</a>
-							  <a class="list-group-item">Track 2</a>
-							  <a class="list-group-item">Track 2</a>
-							  <a class="list-group-item">Track 2</a>
-							  <a class="list-group-item">Track 2</a>
-							  <a class="list-group-item">Track 2</a>
-							  <a class="list-group-item">Track 2</a>
-							  <a class="list-group-item">Track 2</a>
-							  <a class="list-group-item">Track 2</a>
-							  <a class="list-group-item">Track 2</a>
-							  <a class="list-group-item">Track 2</a>
-							  <a class="list-group-item">Track 2</a>
-							  <a class="list-group-item">Track 2</a>
+					  <div id="playlist-tracks" class="list-group" hidefocus="hidefocus">
+							  <a class="list-group-item playlist-track">Track 1</a>
+							  <a class="list-group-item playlist-track active">Track 1</a>
+							  <a class="list-group-item playlist-track">Track 2</a>
+							  <a class="list-group-item playlist-track">Track 2</a>
+							  <a class="list-group-item playlist-track">Track 2</a>
+							  <a class="list-group-item playlist-track">Track 2</a>
+							  <a class="list-group-item playlist-track">Track 2</a>
+							  <a class="list-group-item playlist-track">Track 2</a>
+							  <a class="list-group-item playlist-track">Track 2</a>
+							  <a class="list-group-item playlist-track">Track 2</a>
+							  <a class="list-group-item playlist-track">Track 2</a>
+							  <a class="list-group-item playlist-track">Track 2</a>
+							  <a class="list-group-item playlist-track">Track 2</a>
+							  <a class="list-group-item playlist-track">Track 2</a>
+							  <a class="list-group-item playlist-track">Track 2</a>
+							  <a class="list-group-item playlist-track">Track 2</a>
+							  <a class="list-group-item playlist-track">Track 2</a>
+							  <a class="list-group-item playlist-track">Track 2</a>
+							  <a class="list-group-item playlist-track">Track 2</a>
+							  <a class="list-group-item playlist-track">Track 2</a>
+							  <a class="list-group-item playlist-track">Track 2</a>
+							  <a class="list-group-item playlist-track">Track 2</a>
+							  <a class="list-group-item playlist-track">Track 2</a>
 					  </div>
 			  </div>
 	  </div> <!-- container -->

@@ -79,6 +79,10 @@ code {
 	padding-top: 15px;	
 }
 
+#play-pause {
+	width: 80px;
+}
+
 #player {
 	height: 90px;
 	border-bottom: 1px solid;
@@ -165,4 +169,8 @@ code {
 	margin-bottom: 0;
 	border-bottom-right-radius: 0px;
 	border-bottom-left-radius: 0px;
+}
+
+div {
+	outline: 0;
 }
