@@ -87,7 +87,7 @@ code {
 	width: 80px;
 }
 
-#player {
+#player-container {
 	height: 90px;
 	border-bottom: 1px solid;
 }
@@ -98,20 +98,54 @@ code {
 }
 
 #track-name {
-	font-size: 20px;
+	font-size: 14px;
+}
+
+#track-source {
+	font-size: 10px;
 }
 
 #track-source {
 	border-top: 1px: solid;
 }
 
+#nav-side-bar-search {
+	float: left;
+	width: 250px;
+	margin-left: 20px;
+	position: absolute;
+	top: 120px;
+	left: 70px;
+	height: 20px;
+}
+
 #nav-side-bar {
 	float: left;
-	width: 100px;
-	margin-left: 70px;
+	width: 250px;
+	margin-left: 20px;
 	position: absolute;
-	top: 200px;
+	top: 180px;
 	left: 70px;
+	height: 400px;
+}
+
+#pre-search {
+	border: 1px solid;
+}
+
+#subreddit-search {
+	width: 230px;
+	border: none;
+	border-radius: 5px;
+	text-indent: 5px;
+	box-shadow:0 0 5px #666 inset; 
+	height: 30px;
+	line-height: 25px;
+}
+
+#subreddit-search:focus {
+	outline: none;
+	box-shadow:0 0 5px black inset;
 }
 
 #nav-container-divider {
@@ -145,7 +179,7 @@ code {
 
 #playlist-tracks {
 	margin-top: 40px;
-	height: 500px !important;
+	height: 300px !important;
 }
 
 .list-group {
@@ -177,4 +211,27 @@ code {
 
 div {
 	outline: 0;
+}
+
+.icon-vimeo {
+	background-image: url("../icons/vimeo-16.png");
+	background-position: center center;
+	display: inline-block;
+	height:16px;
+	width:16px; 
+}
+
+.icon-soundcloud {
+	background-image: url("../icons/soundcloud.png");
+	background-position: center center;
+	display: inline-block;
+	height:16px;
+	width:16px; 
+}
+
+.track-error {
+	/*border-left: 3px solid #c0392b;*/
+	background-color:  #c0392b;
+	filter: alpha(opacity=50);
+	opacity: 0.5;
 }

@@ -1,14 +1,22 @@
 <!DOCTYPE html>
 {% load staticfiles %}
 {% block content %}
-<div class="list-group">
+<div id="playlist-meta"><span> {{ playlist|length }} tracks found for {{ subreddit }}.</span></div>
+<div id="playlist-tracks" class="list-group" hidefocus="hidefocus">
 {% for video in playlist %}
-<a href='#' class="list-group-item" id='{{video.videoid}}' onclick="loadVideo.call(this,'{{video.videoid}}','{{video.source}}')">
-			<h4 class='list-group-item-heading'>
-					{{ video.title | safe }}	
-			</h4>
-			<p class='list-group-item-text'>{{video.source}}</p>
+<a class="list-group-item playlist-track" id='{{video.videoid}}' onclick="loadVideo.call(this, {'videoid' : '{{video.videoid}}', 'source' : '{{video.source}}', 'title' : {% filter force_escape %}'{{video.title}}'{% endfilter %}})">
+	{{video.title|safe}}
+	{% if video.source == 'youtube.com' %}
+		<i class="fw-icon-youtube pull-right"></i>
+	{% endif %}
+	{% if video.source == 'vimeo.com' %}
+		<i class="icon-vimeo pull-right"></i>
+	{% endif %}
+	{% if video.source == 'soundcloud.com' %}
+		<i class="icon-soundcloud pull-right"></i>
+	{% endif %}
+
 </a>
 {% endfor %}
-</div> <!-- list-group -->
+</div> <!-- playlist-tracks -->
 {% endblock %}

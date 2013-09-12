@@ -1,7 +1,7 @@
 # Create your views here.
 from django.http import HttpResponse
 from django.template import RequestContext, loader
-from getmusic import getvideos, Song
+from getmusic import getvideos, Song, getSubreddits
 from django.template.response import TemplateResponse
 import simplejson
 
@@ -37,10 +37,11 @@ def player(request):
 				'playlist_json': response_json,
 				'subreddit': subreddit,
 				'playlist': playlist,
+				'subreddits': ['/r/Jazz', '/r/ProgMetal'],
 			})
 		else:
 			print "Usual Execution"
-			context= RequestContext(request, {})
+			context= RequestContext(request, {'subreddits': getSubreddits()})
 		return HttpResponse(template.render(context))
 
 	subreddit = request.POST['subreddit'].split('/')[2]
@@ -48,7 +49,7 @@ def player(request):
 	subreddits.append(subreddit)
 	playlist = getvideos(subreddits, int(limit))
 	template = loader.get_template('vidlist/playlist.html')
-	context = RequestContext(request, {'playlist' : playlist})
+	context = RequestContext(request, {'playlist' : playlist, 'subreddit' : subreddit})
 #	return TemplateResponse(request, template, {'songs' : playlist})
 	return HttpResponse(template.render(context))
 

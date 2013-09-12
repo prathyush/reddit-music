@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+{% block content %}
+{% if not subreddits %}
+{% endif %}
+	{% for subreddit in subreddits %}
+		<li><a class="navlinks" href="#">{{subreddit}}</a></li>
+	{% endfor %}
+{% endblock %}

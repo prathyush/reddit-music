@@ -34,7 +34,7 @@
 						$(this).addClass('active');
 					});
 				});
-			function playButtonPress() {
+				function playButtonPress() {
 			if ($("#play-pause i").hasClass('fw-icon-pause')) {
 				$("#play-pause i").toggleClass("fw-icon-play fw-icon-pause"); //.button('refresh');
 			}
@@ -65,14 +65,14 @@
 	  <!-- Begin page content -->
 	  <div id="nav-side-bar">
 			  <ul class="nav nav-pills nav-stacked">
-					  <li class="active"><a href=""> /r/Jazz </a></li>
+					  <li class="active"><a href=""> /r/jazz </a></li>
 					  <li><a href=""> /r/blues </a></li>
 					  <li><a href=""> /r/bluesrock </a></li>
 			  </ul>
 	  </div>
 	  <!-- 	  <div id="nav-container-divider"></div> -->
 	  <div class="container">
-			  <div id="player">
+			  <div id="player-container">
 					  <div id='player-controls' class='' style="">
 							  <div id="previous" class='' onclick='playPrevTrack()' href='#' style='text-decoration: none'><i class="fw-icon-step-backward fw-icon-3x"></i></div>
 							  <div id="play-pause" class='' onclick='playButtonPress()' href='#' style='text-decoration: none'><i class="fw-icon-play fw-icon-5x"></i></div>
@@ -90,6 +90,7 @@
 							  <a class="list-group-item playlist-track">Track 2</a>
 							  <a class="list-group-item playlist-track">Track 2</a>
 							  <a class="list-group-item playlist-track">Track 2</a>
+							  <a class="list-group-item playlist-track">Track 2<i class='icon-vimeo pull-right'></i>vimeo</a>
 							  <a class="list-group-item playlist-track">Track 2</a>
 							  <a class="list-group-item playlist-track">Track 2</a>
 							  <a class="list-group-item playlist-track">Track 2</a>
@@ -98,17 +99,8 @@
 							  <a class="list-group-item playlist-track">Track 2</a>
 							  <a class="list-group-item playlist-track">Track 2</a>
 							  <a class="list-group-item playlist-track">Track 2</a>
-							  <a class="list-group-item playlist-track">Track 2</a>
-							  <a class="list-group-item playlist-track">Track 2</a>
-							  <a class="list-group-item playlist-track">Track 2</a>
-							  <a class="list-group-item playlist-track">Track 2</a>
-							  <a class="list-group-item playlist-track">Track 2</a>
-							  <a class="list-group-item playlist-track">Track 2</a>
-							  <a class="list-group-item playlist-track">Track 2</a>
-							  <a class="list-group-item playlist-track">Track 2</a>
-							  <a class="list-group-item playlist-track">Track 2</a>
-					  </div>
-			  </div>
+					</div> <!-- playlist-tracks -->
+			  </div> <!-- playlist -->
 	  </div> <!-- container -->
 	</div> <!-- wrap -->
 

@@ -1,31 +1,53 @@
 <!DOCTYPE html>
 {% load staticfiles %}
 <html>
-	<link rel="stylesheet" type="text/css" href="{% static 'vidlist/css/player.css' %}" />
 	<link rel="stylesheet" type="text/css" href="{% static 'vidlist/font-awesome/css/font-awesome.min.css' %}" />
 	<link rel="stylesheet" type="text/css" href="{% static 'vidlist/bootstrap3/dist/css/bootstrap.min.css' %}" />
-	<link rel="stylesheet" type="text/css" href="{% static 'vidlist/bootstrap3/dist/css/bootstrap.css' %}" />
 	<link href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css"/>
 	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
 	<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-	<script src="http://w.soundcloud.com/player/api.js"></script>
-	<script src="http://a.vimeocdn.com/js/froogaloop2.min.js?36191-1378685323"></script>
-	<script src="{% static 'vidlist/bootstrap3/dist/js/bootstrap.min.js' %}"></script>
-	<script src="{% static 'vidlist/bootstrap3/dist/js/bootstrap.js' %}"></script>
-	<script src="{% static 'vidlist/js/bootstrap-list.js' %}"></script>
-	<script src="http://connect.soundcloud.com/sdk.js"></script>
-	<script src="//connect.soundcloud.com/sdk.js"></script>
-	<script type="text/javascript"> SC.initialize({client_id: "dab62a6ff784a2bdc938a8047675ccd0"}); </script>
+	<script src="{% static 'vidlist/js/jquery.nicescroll.min.js' %}"></script>
+	<script src="{% static 'vidlist/js/jquery.livesearch.orig.js' %}"></script>
+	<script src="{% static 'vidlist/js/quicksilver.js' %}"></script>
 	<script type="text/javascript" src="{% static 'vidlist/pnotify/jquery.pnotify.min.js' %}"></script>
 	<link href="{% static 'vidlist/pnotify/jquery.pnotify.default.css' %}" media="all" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" type="text/css" href="{% static 'vidlist/css/demo.css' %}" />
 
+	<script src="http://w.soundcloud.com/player/api.js"></script>
+	<script src="http://a.vimeocdn.com/js/froogaloop2.min.js?36191-1378685323"></script>
+	<script src="http://connect.soundcloud.com/sdk.js"></script>
+	<script type="text/javascript"> SC.initialize({client_id: "dab62a6ff784a2bdc938a8047675ccd0"}); </script>
 	<script>
 		// Global variables
 		global = {};
+		options = {};
+
+		/*
+		 * Player States
+		 *
+		 * UNLOADED : 0
+		 * LOADED : 1
+		 * PLAYING : 2
+		 * PAUSED : 3
+		 * BUFFERING : 4
+		 * ERROR : 5
+		 */
+
 		global.playerState = 0;
-		global.curVideoId = 'videoid';
-		global.curVideoSource = 'source';
-		global.curVideoDuration = 0; //seconds
+		global.videoid = undefined;
+		global.source = undefined;
+		global.duration = 0; //seconds
+		global.curTrackTime = 0; //milliseconds
+
+		/*
+		 * Options
+		 *
+		 */
+
+		 options.playlist = 1; // Playlist mode by default.
+		 options.autoplay = 1; // Start playing when selected.
+
+
 
 		{% if playlist_json %}
 		//We've got a GET request. Let's load the playlist with these and possibly use the subreddit to highlight the nav.
@@ -49,7 +71,7 @@
 				events: {
 					'onReady': onPlayerReady,
 					'onStateChange': onPlayerStateChange,
-					'onError': onError
+					'onError': onPlayerError
 				}
 			});
 		}
@@ -61,17 +83,21 @@
 			updatePlayerInfo('youtube');
 		}
 
+		function onPlayerError(errorCode) {
+			  //alert("Youtube: An error occured of type:" + errorCode.data);
+			if (errorCode.data != 150)
+				onError('youtube.com');
+		}
+
 		function onPlayerStateChange(event) {
-			var duration;
 			if (event.data == YT.PlayerState.PLAYING) {
 				console.log('Youtube: Elapsed:'+player.getCurrentTime()+'. And, fraction :'+player.getVideoLoadedFraction()+'.');
-				onPlaying();
+				global.duration = player.getDuration();
 				onPlay();
 			}
 			if (event.data == YT.PlayerState.CUED) {
 				console.log('Youtube: Cued');
-				duration = player.getDuration();
-				onPlay();
+				global.duration = player.getDuration();
 			}
 			if (event.data == YT.PlayerState.ENDED) {
 				console.log('Youtube: Ended');
@@ -179,7 +205,7 @@
 			window.scWidget.bind(SC.Widget.Events.ERROR, function(eventData){
 				console.log('Soundcloud: Error');
 				console.log(JSON.stringify(eventData || {}));
-				onError();
+				onError('soundcloud.com');
 			});
 
 			// Vimeo IFRAME API Code.
@@ -191,6 +217,7 @@
 			vplayer.addEvent('ready', function() {
 				console.log("Vimeo: Ready for requests.");
 				vplayer.addEvent('pause', onPause);
+				vplayer.addEvent('play', onPlay);
 				vplayer.addEvent('finish', onFinish);
 				vplayer.addEvent('playProgress', onPlayProgress);
 			
@@ -209,43 +236,55 @@
 
 			$('.navlinks').click(function() {
 				text = $(this).text();
-				console.log('sub-reddit:'+text);
-				submit_ajax(text);
+				if (!$(this).parent().hasClass('active')) {
+					$(this).parent().parent().find('.active').removeClass('active');
+					$(this).parent().addClass('active');				
+					console.log('sub-reddit:'+text);
+					submit_ajax(text);
+				} else {
+					console.log('clicked on the same sub-reddit');
+				}
+
 			});
 
+			// Refer http://code.google.com/p/jquery-nicescroll/
+			$("html").niceScroll({styler:"fb",cursorcolor:"#000", cursorwidth:'2px'});
+			$("#nav-side-bar").niceScroll();
+
+			//http://ejohn.org/blog/jquery-livesearch/
+			$('#subreddit-search').liveUpdate('subreddits').focus();
 			$('#progress-bar').hide();
-			//					loadVimeo('73874741');
-			/*
-			$('#playlist').list();
-			$('#playlist').on('change', function(event){
-				var message = "selected index: "+event.selectedIndex+"\n"+
-				"selected item: "+event.srcElement.get()[0].outerHTML;
-				alert( message );
-			}); */
 			console.log('Done with doc.ready stuff');
 		});
 
 		// Generic event handlers
 
 		function onPlay() {
-			console.log("onPlay");
+			global.playerState = 2;
+			console.log("onPlay : "+global.source);
 			$("#play-pause i").removeClass("fw-icon-play").addClass("fw-icon-pause"); //.button('refresh');
-			playVideo(getCurrentTrackSource());
+			playVideo(global.source);
 		}
 		function onPause() {
-			console.log("onPause: "+getCurrentTrackSource());
+			global.playerState = 3;
+			console.log('onPause : '+global.source);
+			pauseVideo(global.source);
 			$("#play-pause i").removeClass("fw-icon-pause").addClass("fw-icon-play"); //.button('refresh');
-			pauseVideo(getCurrentTrackSource());
 		}
-		function onError() {
+		function onError(source) {
+			global.playerState = 5;
+			global.source = undefined;
 			$("#play-pause i").removeClass("fw-icon-pause").addClass("fw-icon-play"); //.button('refresh');
-			alert('There has been a playback error, lets move on.');
+			//alert(source+': Error.');
+			$("#playlist-tracks").find(".active").addClass("track-error");
+			playNextTrack();
 		}
 		function onPlayProgress() {
 		}
 		function onPlaying() {
 		}
 		function onBuffering() {
+			global.playerState = 4;
 			console.log("Buffering...");
 		}
 		function onFinish() {
@@ -260,7 +299,6 @@
 		function updatePlayerInfo() {
 		}
 
-
 		// AJAX request for playlist.
 
 		function submit_ajax(text) {
@@ -269,12 +307,16 @@
 				url: '',
 				data: { 'csrfmiddlewaretoken':'{{csrf_token}}',
 					'subreddit' : text,
-					'limit' : 100
+					'limit' : 200
 				},
 				success: function(data, status, xhr) {
 					console.log("AJAX success; status:"+status);
 					console.log("data: "+data);
 					$("#playlist").html(data);
+					//Initialize niceScroll.
+					$("#playlist-tracks").niceScroll();
+					if (options.autoplay)
+						playFirstTrack();
 				}
 			});
 		}
@@ -344,17 +386,32 @@
 			loadIframe('vimeo-player', {'src': srcStr});
 		}
 
-		function loadVideo(videoid, source) {
+		function loadVideo(song) {
+			//Lets set the player state to loading
+			global.playerState = 1;
+
+			console.log('loadVideo');	
+			source = song['source'];
+			videoid = song['videoid'];
 			console.log('source :'+source);	
 			$(this).parent().find('.active').removeClass('active');
 			$(this).addClass('active');
-			global.videoid = videoid;
+
+			if ((global.videoid != undefined) && (global.videoid == videoid)) {
+				//alert("Already playing this no - doing nothing "+global.videoid+" "+videoid);
+				return; //already playing this, what the hell, go use the player controls.
+			} else {
+				global.videoid = videoid;
+			}
+
 			if ((typeof(global.source) != undefined) && (global.source != source)) {
 				console.log('Switching the source from:'+global.source+' to '+source);
+				//alert('Switching the source from:'+global.source+' to '+source);
 				//Then we make sure we stop playing whatever's in place.
 				stopVideo(global.source);	
 				global.source = source;
-			}	
+			}
+
 			switch(source) {
 				case 'youtube.com':
 					youtubeLoadVideo(videoid);
@@ -369,10 +426,16 @@
 					break;	
 
 			}
+				
+			// Update Player meta-data
+			console.log(unescape(song.title).replace("&#39;", "'"));
+			$("#track-name").text(unescape(song.title).replace("&#39;", "'"));
+			$("#track-source").text(song.source);
 		}
 
 		function stopVideo(source) {
 			console.log('stopVideo: For '+source);
+			//alert('stopVideo: For '+source);
 			switch(source) {
 				case 'youtube.com':
 					youtubeStopVideo();
@@ -388,6 +451,7 @@
 		}
 
 		function playVideo(source) {
+			console.log('playVideo: '+source);
 			switch(source) {
 				case 'youtube.com':
 				youtubePlayVideo();
@@ -404,31 +468,20 @@
 		}
 
 		function pauseVideo(source) {
+			console.log('pauseVideo: '+source);
 			switch(source) {
 				case 'youtube.com':
-				youtubePauseVideo();
+					youtubePauseVideo();
 				break;
 				case 'vimeo.com':
-				vplayer.api('pause');
+					vplayer.api('pause');
 				break;
 				case 'soundcloud.com':
-				pauseSoundcloud();
+					pauseSoundcloud();
 				break;
 				default:
 				break;
 			}
-		}
-
-		function getCurrentTrack() {
-			return $('#playlist').find('.active');
-		}
-
-		function getCurrentTrackSource() {
-			return getCurrentTrack().find('.list-group-item-text').text();
-		}
-
-		function getCurrentTrackId() {
-			return getCurrentTrack().attr('id');
 		}
 
 		function playNextTrack() {
@@ -436,10 +489,13 @@
 			curTrack.removeClass('active');
 			var nextTrack = curTrack.next('.list-group-item')
 			nextTrack.addClass('active');
+			/*
 			var videoid = nextTrack.attr('id');
 			var source = nextTrack.find('.list-group-item-text').text();
 			console.log('Next Track: '+videoid+', source: '+source);
-			loadVideo(videoid, source);
+			loadVideo({'videoid' : videoid, 'source' : source});
+			*/
+			nextTrack.trigger('click');
 		}
 
 		function playPrevTrack() {
@@ -447,24 +503,23 @@
 			curTrack.removeClass('active');
 			var prevTrack = curTrack.prev('.list-group-item')
 			prevTrack.addClass('active');
+			/*
 			var videoid = prevTrack.attr('id');
 			var source = prevTrack.find('.list-group-item-text').text();
 			console.log('Previous Track: '+videoid);
-			loadVideo(videoid, source);
+			loadVideo({'videoid' : videoid, 'source' : source});
+			*/
+			prevTrack.trigger('click');
 		}
 
-
-		function populateList(videoElements) {
-			var items = [];
-			$.each(videoElements, function (key, value) {
-				items.push('<a href="#" class="list-group-item">'+'<span>'+value.title+'</span></a>');
-			});
-			$("#playlist").append(items.join(''));
-		}
 		
+		function playFirstTrack() {
+		//	alert('playFirstTrack()');
+			console.log('playFirstTrack()');
+			$("#playlist-tracks a:first-child").trigger('click');	
+		}
+
 		function consume_alert() {
-		//	if (_alert) return;
-		//	_alert = window.alert;
 			window.alert = function(message) {
 				$.pnotify({
 					title: 'Alert',
@@ -477,7 +532,7 @@
 		consume_alert();
 		</script>
 		<body>  
-		<div id="wrapper"></div>
+			<div id="wrap">
 		<div id="players" style='visibility: hidden; height: 2px; width: 2px'>
 			<div id="splayer">
 				<iframe  id="soundcloud-player" src="http://w.soundcloud.com/player/?url=https://api.soundcloud.com/aurora-florence/forever-and-a-day&show_artwork=false&liking=false&sharing=false&auto_play=false" width='1' height='1'></iframe>
@@ -488,40 +543,63 @@
 			<div id="vplayer">
 				<iframe id="vimeo-player" src="http://player.vimeo.com/video/27855315?api=1&player_id=vimeo-player" width="1" height="1" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
 			</div>
-		</div> <!-- players -->
-		<div id="content">
-			<div id="nav" class="pull-left" style-="height: 100%">
-				{% csrf_token %}
-				<ul class="nav nav-pills nav-stacked">
-					<li><a href="#" class='navlinks' id='nav-link'>/r/jazz</a></li>
-					<li><a href="#" class='navlinks' id='nav-link'>/r/blues</a></li>
-					<li><a href="#" class='navlinks' id='nav-link'>/r/bluesrock</a></li>
-					<li><a href="#" class='navlinks' id='nav-link'>/r/progmetal</a></li>
-				</ul>
-			</div>
+		</div> <!-- players --> 
+		<!-- title div -->
+		<div id="title-bar">
+			<span id="title-text">//reddit-music <i class='fw-icon-headphones'></i></span>
+			<span id="title-author" class="pull-right"></span>
+		</div>
+		<div id="nav-side-bar-search">
+			<span id="" class=""><i class="fw-icon-search"></i></span>
+			<input type="text" autocomplete="off" class="" name="subreddit-search" id="subreddit-search" placeholder="//subreddit"/>
+			<hr color="black" width="100px">
+		</div>
+		<div id="nav-side-bar">
+			{% csrf_token %}
+			<ul class="nav nav-pills nav-stacked" id="subreddits">
+				{% include "vidlist/nav-side-bar.html" %}
+				<li><a class="navlinks" href="#">prathyush</a></li>
+			</ul>
+		</div> <!-- nav-side-bar -->
+		<div class="container">
 			<div id='player-container' class=''>
-			<div id='player-controls'>
-					<a id="previous" class='' onclick='playPrevTrack()' href='#' style='text-decoration: none'><i class="fw-icon-step-backward fw-icon-2x"></i></a>&nbsp;&nbsp;&nbsp;
-					<a id="play-pause" class='' onclick='playButtonPress()' href='#' style='text-decoration: none'><i class="fw-icon-play fw-icon-3x"></i></a>&nbsp;&nbsp;
-					<a id="next" class='' onclick='playNextTrack()' href='#' style='text-decoration: none'><i class="fw-icon-step-forward fw-icon-2x"></i></a>
-				</div>
-				<div id='now-playing'><span> Now Playing</span><p>source</p></div>
+				<div id='player-controls' class='' style="">
+					<div id="previous" class='' onclick='playPrevTrack()' href='#' style='text-decoration: none'><i class="fw-icon-step-backward fw-icon-3x"></i></div>
+					<div id="play-pause" class='' onclick='playButtonPress()' href='#' style='text-decoration: none'><i class="fw-icon-play fw-icon-5x"></i></div>
+					<div id="next" class='' onclick='playNextTrack()' href='#' style='text-decoration: none'><i class="fw-icon-step-forward fw-icon-3x"></i></div>
+			</div> <!-- player-controls -->
+			<div id="now-playing"><span id="track-name">//Song</span><br><span id="track-source">//Source</span></div>
 			<!--			<div id="seekbar"></div> -->
 			<!--			<span id="time-elapsed">0:00</span> -->
+			<!--
 			<div id="progress-bar">
-					<div id="scrubber" class='fw-icon-circle pull-left' style="left: 0px; color: white; margin-top: 0px;"></div>
+				<div id="scrubber" class='fw-icon-circle pull-left' style="left: 0px; color: white; margin-top: 0px;"></div> -->
 					<!--					<div id="buffered" style="width: 0%"></div> -->
-					<div id="elapsed" style="width: 0%"></div>
-			</div>
-			<!--			<span id="time-total">0:00</span> -->
+<!--					<div id="elapsed" style="width: 0%"></div>
+				</div> -->
+				<!--			<span id="time-total">0:00</span> --> 
 	</div> <!-- player-container -->
-	<div id='playlist' class='list'>
+	<div style="clear: both"></div>
+	<div id='playlist'>
 		{% if playlist %}
 		{% include "vidlist/playlist.html" %}
+		{% else %}
+		<blockquote>Just pick a subreddit, will yeah ?</blockquote>
 		{% endif %}
 	</div> <!-- playlist -->
 	</div> <!-- content -->
-	</div> <!-- wrapper -->
-	</body>
-	</html>
+</div> <!-- wrapper -->
+	<div id="footer">
+			<div class="container">
+				<p class="text-muted credit">Created and Maintained by <a href="#">Prathyush Thota</a>.&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;<a href="https://github.com/prathyush/reddit-music">Github.</a></i></p>
+	</div>
+	</div>
 
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+	<script src="{% static 'vidlist/bootstrap3/dist/js/bootstrap.min.js' %}"></script>
+	<script src="{% static 'vidlist/bootstrap3/dist/js/bootstrap.js' %}"></script>
+  </body>
+</html>
