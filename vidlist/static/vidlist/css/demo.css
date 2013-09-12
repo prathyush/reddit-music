@@ -44,6 +44,10 @@ body {
   padding-left: 15px;
   padding-right: 15px;
 }
+
+#footer > .container > p > a {
+	color: black;
+}
 .container {
 	width: 50%;
 }
@@ -53,7 +57,7 @@ code {
 
 #title-bar {
 	height: 60px;
-	background: black;	
+	background: black;
 }
 
 #title-text {
@@ -141,7 +145,7 @@ code {
 
 #playlist-tracks {
 	margin-top: 40px;
-	height: 400px !important;
+	height: 500px !important;
 }
 
 .list-group {
