@@ -275,3 +275,22 @@ div {
 	width: 33px;
 	height: 33px;
 }
+
+.alert-error {
+  color: #b94a48;
+  background-color: #f2dede;
+  border-color: #eed3d7;
+}
+
+
+#navigation-end {
+	position: absolute;
+	top: 625px;
+	width: 230px;
+	float: left;
+	left: 70px;
+}
+
+a, a:hover {
+	color: black;
+}

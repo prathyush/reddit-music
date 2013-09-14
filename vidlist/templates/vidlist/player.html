@@ -11,6 +11,7 @@
 	<script src="{% static 'vidlist/js/quicksilver.js' %}"></script>
 	<script src="{% static 'vidlist/js/jquery.scrollTo-1.4.3.1-min.js' %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% static 'vidlist/css/demo.css' %}" />
+	<link href="{% static 'vidlist/pnotify/jquery.pnotify.default.icons.css' %}" media="all" rel="stylesheet" type="text/css" />
 
 	<script src="http://w.soundcloud.com/player/api.js"></script>
 	<script src="http://a.vimeocdn.com/js/froogaloop2.min.js?36191-1378685323"></script>
@@ -237,6 +238,7 @@
 			$('.navlinks').click(function() {
 				text = $(this).text();
 				if (!$(this).parent().hasClass('active')) {
+					$("#nav-side-bar").find(".active").find("i").removeClass("fw-icon-spinner fw-icon-spin fw-icon-2x");
 					$(this).parent().parent().find('.active').removeClass('active');
 					$(this).parent().addClass('active');				
 					console.log('sub-reddit:'+text);
@@ -254,17 +256,35 @@
 			//http://ejohn.org/blog/jquery-livesearch/
 			$('#subreddit-search').liveUpdate('subreddits').focus();
 			$('#progress-bar').hide();
+
+
+			initializeTooltips();
 			console.log('Done with doc.ready stuff');
 		});
+
+		//Initilize tooltips
+		function initializeTooltips() {
+			$("[rel=tooltip]").tooltip({});
+			$("[rel=tooltip-right]").tooltip({ placement: 'right'});
+			$("[rel=tooltip-left]").tooltip({ placement: 'right'});
+			$("[rel=tooltip-top]").tooltip({ placement: 'right'});
+			$("[rel=tooltip-bottom]").tooltip({ placement: 'right'});
+		}
 
 		// Generic event handlers
 
 		function onPlay() {
-			global.playerState = 2;
-			console.log("onPlay : "+global.source);
-			$("#play-pause i").removeClass("fw-icon-play").addClass("fw-icon-pause"); //.button('refresh');
-			playVideo(global.source);
+			console.log("onPlay : "+global.source+" playerState "+global.playerState+" global.videodid: "+global.videoid);
+			if (global.videoid != undefined) {
+				playVideo(global.source);
+				$("#play-pause i").removeClass("fw-icon-play").addClass("fw-icon-pause"); //.button('refresh');
+				global.playerState = 2;
+			} else {
+				console.log("then, else, then");
+				playFirstTrack();
+			}
 		}
+
 		function onPause() {
 			global.playerState = 3;
 			console.log('onPause : '+global.source);
@@ -309,19 +329,34 @@
 			$.ajax({
 				type: 'POST',
 				url: '',
+				beforeSend : function() {
+					console.log("beforeSend: "+$("#nav-side-bar").find(".active").html());
+					$("#nav-side-bar").find(".active").find("i").addClass("fw-icon-spinner fw-icon-spin fw-icon-2x");
+				},
 				data: { 'csrfmiddlewaretoken':'{{csrf_token}}',
 					'subreddit' : text,
 					'limit' : 200
 				},
 				success: function(data, status, xhr) {
+				console.log(status);
+				/*
+					var errors = jQuery.parseJSON(data);
+					if (errors) {
+						$("#nav-side-bar").find(".active").find("i").removeClass("fw-icon-spinner fw-icon-spin fw-icon-2x");
+						alert("Fetch failed, try again");
+						} else {
+				*/
 					console.log("AJAX success; status:"+status);
-					console.log("data: "+data);
+					//console.log("data: "+data);
+					$("#nav-side-bar").find(".active").find("i").removeClass("fw-icon-spinner fw-icon-spin fw-icon-2x");
 					$("#playlist").html(data);
 					//Initialize niceScroll.
 					$("#playlist-tracks").niceScroll();
 					if (options.autoplay)
 						playFirstTrack();
-				}
+						initializeTooltips();
+						}
+				
 			});
 		}
 
@@ -436,7 +471,9 @@
 				
 			// Update Player meta-data
 			console.log(unescape(song.title).replace("&#39;", "'"));
-			$("#track-name").text(unescape(song.title).replace("&#39;", "'"));
+			$("#track-name").find("a").text(unescape(song.title).replace("&#39;", "'"));
+			$("#track-name").find("a").attr("href", song.url);
+			$("#track-name").find("a").attr("title", " Watch the video on "+song.source+".");
 			$("#track-source").text(song.source);
 		}
 
@@ -522,8 +559,13 @@
 		
 		function playFirstTrack() {
 			//alert('playFirstTrack()');
-			console.log('playFirstTrack()');
-			$("#playlist-tracks span:first-child").trigger('click');	
+			var firstTrack = $("#playlist-tracks span:first-child");	
+			if (firstTrack.length) {
+				firstTrack.trigger('click');
+				console.log('playFirstTrack()');
+				}
+			else 
+				notifyError({title : "Playlist Error", text : "Looks like you haven't selected any subreddit."});
 			}
 
 		// errorMsg = { title, text }
@@ -531,16 +573,9 @@
 			$.pnotify({
 				title: errorMsg.title,
 				text:  errorMsg.text,
-				type: 'error'
-			});
-			$.pnotify({
-				title: 'Custom Styling',
-				text: 'I have an additional class that\'s used to give me special styling. I always wanted to be pretty.',
-				addclass: 'custom',
-				icon: 'picon picon-32 picon-fill-color',
-				opacity: .8,
-				nonblock: true,
-				nonblock_opacity: .2
+				type: 'error',
+				styling: 'bootstrap',
+				animation: 'fade'
 			});
 		}
 
@@ -586,6 +621,9 @@
 				<li><a class="navlinks" href="#">prathyush</a></li>
 			</ul>
 		</div> <!-- nav-side-bar -->
+		<div id="navigation-end">
+			<hr color="black" width="100px">
+		</div>
 		<div class="container">
 			<div id='player-container' class=''>
 				<div id='player-controls' class='' style="">
@@ -593,7 +631,7 @@
 					<div id="play-pause" class='' onclick='playButtonPress()' href='#' style='text-decoration: none'><i class="fw-icon-play fw-icon-5x"></i></div>
 					<div id="next" class='' onclick='playNextTrack()' href='#' style='text-decoration: none'><i class="fw-icon-step-forward fw-icon-3x"></i></div>
 			</div> <!-- player-controls -->
-			<div id="now-playing"><span id="track-name">//Song</span><br><span id="track-source">//Source</span></div>
+			<div id="now-playing"><span id="track-name"><a target="_blank" rel="tooltip-top" title="google.com" href="#">//Song</a></span><br><span id="track-source">//Source</span></div>
 			<!--			<div id="seekbar"></div> -->
 			<!--			<span id="time-elapsed">0:00</span> -->
 			<!--

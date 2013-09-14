@@ -48,6 +48,10 @@ def player(request):
 	limit = request.POST['limit']
 	subreddits.append(subreddit)
 	playlist = getvideos(subreddits, int(limit))
+	if (playlist is None):
+		errors = {}
+		errors['error'] = 'Fetch Failed'
+		return HttpResponse(simplejson.dumps(errors));
 	template = loader.get_template('vidlist/playlist.html')
 	context = RequestContext(request, {'playlist' : playlist, 'subreddit' : subreddit})
 #	return TemplateResponse(request, template, {'songs' : playlist})

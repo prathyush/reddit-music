@@ -34,8 +34,9 @@ def getRedditJSON(subreddit, limit):
 	f = urllib.urlopen(url)
 	return json.load(f)
 
+retries = 0;
 def getvideos(subreddits, limit):
-
+	global retries;
 	for subreddit in subreddits:
 		try:
 			json_data = getRedditJSON(subreddit, limit)
@@ -56,8 +57,14 @@ def getvideos(subreddits, limit):
 
 		except KeyError, e:
 			print "Error: Malformed JSON return file"
-			#Usually it makes sense to go for another run.
-#			return getvideos(subreddits, limit);
+			time.sleep(2);
+
+			if retries < 3:
+				retries += 1;
+				return getvideos(subreddits, limit);
+			else:
+				retries = 0;
+				return None
 
 		return songs
 def getSubreddits():

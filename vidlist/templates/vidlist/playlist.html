@@ -2,10 +2,10 @@
 {% load staticfiles %}
 {% load custom-tags %}
 {% block content %}
-<div id="playlist-meta"><span> {{ playlist|length }} tracks found for {{ subreddit }}.</span></div>
+<div id="playlist-meta"><span> {{ playlist|length }} tracks found for <a target="_blank" href="http://www.reddit.com/r/{{subreddit}}" rel="tooltip-right" title="Follow this on reddit." placement="right">/r/{{subreddit}}</a>.</span></div>
 <div id="playlist-tracks" class="list-group" hidefocus="hidefocus">
 {% for video in playlist %}
-<span class="list-group-item playlist-track" id='{{video.videoid}}' onclick="loadVideo.call(this, {'videoid' : '{{video.videoid}}', 'source' : '{{video.source}}', 'title' : {% filter force_escape %}'{{video.title}}'{% endfilter %}})">
+<span class="list-group-item playlist-track" id='{{video.videoid}}' onclick="loadVideo.call(this, {'url':'{{video.videoid}}','videoid' : '{{video.videoid}}', 'source' : '{{video.source}}', 'title' : {% filter force_escape %}'{{video.title}}'{% endfilter %}})">
 	{{video.title|decode}}
 	<a href="{{video.url}}">
 	{% if video.source == 'youtube.com' %}
