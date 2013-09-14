@@ -186,7 +186,8 @@ code {
 .list-group {
 }
 
-.playlist-track {
+.playlist-track:hover {
+	background-color: #f5f5f5;
 }
 
 .list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {
@@ -194,6 +195,15 @@ code {
 	border-color: black;
 	border-left: none;
 	border-right: none;
+}
+
+
+.list-group-item > a {
+	text-decoration: none;
+	color: inherit;
+}
+
+.list-group-item > a {
 }
 
 .list-group-item, .list-group-item:hover, .list-group-item:focus {
@@ -235,4 +245,33 @@ div {
 	background-color:  #c0392b;
 	filter: alpha(opacity=50);
 	opacity: 0.5;
+}
+
+.ui-pnotify.custom .ui-pnotify-container {
+	background-color: #404040 !important;
+	background-image: none !important;
+	border: none !important;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+}
+.ui-pnotify.custom .ui-pnotify-title, .ui-pnotify.custom .ui-pnotify-text {
+	font-family: Arial, Helvetica, sans-serif !important;
+	text-shadow: 2px 2px 3px black !important;
+	font-size: 10pt !important;
+	color: #FFF !important;
+	padding-left: 50px !important;
+	line-height: 1 !important;
+	text-rendering: geometricPrecision !important;
+}
+.ui-pnotify.custom .ui-pnotify-title {
+	font-weight: bold;
+}
+.ui-pnotify.custom .ui-pnotify-icon {
+	float: left;
+}
+.ui-pnotify.custom .picon {
+	margin: 3px;
+	width: 33px;
+	height: 33px;
 }

@@ -9,14 +9,14 @@
 	<script src="{% static 'vidlist/js/jquery.nicescroll.min.js' %}"></script>
 	<script src="{% static 'vidlist/js/jquery.livesearch.orig.js' %}"></script>
 	<script src="{% static 'vidlist/js/quicksilver.js' %}"></script>
-	<script type="text/javascript" src="{% static 'vidlist/pnotify/jquery.pnotify.min.js' %}"></script>
-	<link href="{% static 'vidlist/pnotify/jquery.pnotify.default.css' %}" media="all" rel="stylesheet" type="text/css" />
+	<script src="{% static 'vidlist/js/jquery.scrollTo-1.4.3.1-min.js' %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% static 'vidlist/css/demo.css' %}" />
 
 	<script src="http://w.soundcloud.com/player/api.js"></script>
 	<script src="http://a.vimeocdn.com/js/froogaloop2.min.js?36191-1378685323"></script>
 	<script src="http://connect.soundcloud.com/sdk.js"></script>
 	<script type="text/javascript"> SC.initialize({client_id: "dab62a6ff784a2bdc938a8047675ccd0"}); </script>
+	<link href="{% static 'vidlist/pnotify/jquery.pnotify.default.css' %}" rel="stylesheet" type="text/css" />
 	<script>
 		// Global variables
 		global = {};
@@ -248,7 +248,7 @@
 			});
 
 			// Refer http://code.google.com/p/jquery-nicescroll/
-			$("html").niceScroll({styler:"fb",cursorcolor:"#000", cursorwidth:'2px'});
+			$("html").niceScroll({styler:"fb",cursorcolor:"#000", cursorwidth:'2px', autohidemode : false});
 			$("#nav-side-bar").niceScroll();
 
 			//http://ejohn.org/blog/jquery-livesearch/
@@ -276,6 +276,10 @@
 			global.source = undefined;
 			$("#play-pause i").removeClass("fw-icon-pause").addClass("fw-icon-play"); //.button('refresh');
 			//alert(source+': Error.');
+			errorMsg = {};
+			errorMsg.title = "Playback Error";
+			errorMsg.text = "We couldn't get to play the track, probably, because of embed restrictions";
+			notifyError(errorMsg);
 			$("#playlist-tracks").find(".active").addClass("track-error");
 			playNextTrack();
 		}
@@ -389,6 +393,9 @@
 		function loadVideo(song) {
 			//Lets set the player state to loading
 			global.playerState = 1;
+
+			//scroll to that element
+			$("#playlist-tracks").scrollTo($(this), 1000);
 
 			console.log('loadVideo');	
 			source = song['source'];
@@ -514,9 +521,27 @@
 
 		
 		function playFirstTrack() {
-		//	alert('playFirstTrack()');
+			//alert('playFirstTrack()');
 			console.log('playFirstTrack()');
-			$("#playlist-tracks a:first-child").trigger('click');	
+			$("#playlist-tracks span:first-child").trigger('click');	
+			}
+
+		// errorMsg = { title, text }
+		function notifyError(errorMsg) {
+			$.pnotify({
+				title: errorMsg.title,
+				text:  errorMsg.text,
+				type: 'error'
+			});
+			$.pnotify({
+				title: 'Custom Styling',
+				text: 'I have an additional class that\'s used to give me special styling. I always wanted to be pretty.',
+				addclass: 'custom',
+				icon: 'picon picon-32 picon-fill-color',
+				opacity: .8,
+				nonblock: true,
+				nonblock_opacity: .2
+			});
 		}
 
 		function consume_alert() {
@@ -601,5 +626,6 @@
     <!-- Placed at the end of the document so the pages load faster -->
 	<script src="{% static 'vidlist/bootstrap3/dist/js/bootstrap.min.js' %}"></script>
 	<script src="{% static 'vidlist/bootstrap3/dist/js/bootstrap.js' %}"></script>
+	<script type="text/javascript" src="{% static 'vidlist/pnotify/jquery.pnotify.min.js' %}"></script>
   </body>
 </html>

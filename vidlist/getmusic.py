@@ -56,6 +56,9 @@ def getvideos(subreddits, limit):
 
 		except KeyError, e:
 			print "Error: Malformed JSON return file"
+			#Usually it makes sense to go for another run.
+#			return getvideos(subreddits, limit);
+
 		return songs
 def getSubreddits():
 	return subreddits
